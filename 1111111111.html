@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Change App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button, select {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        select {
+            background-color: #0069d9;
+        }
+        #chartContainer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Climate Change App</h1>
+    <p>Select an option:</p>
+    <button onclick="displayData()">Display Data</button>
+    <select id="chartType">
+        <option value="line">Line Graph</option>
+        <option value="bar">Bar Graph</option>
+        <option value="pie">Pie Chart</option>
+        <option value="scatter">Scatter Plot</option>
+        <option value="area">Area Chart</option>
+        <option value="radar">Radar Chart</option>
+    </select>
+    <button onclick="visualizeData()">Visualize Data</button>
+    <button onclick="predictYearlyTemperature()">Predict Yearly Temperature</button>
+    <button onclick="predictMonthlyTemperature()">Predict Monthly Temperature</button>
+    <div id="output"></div>
+    <div id="chartContainer">
+        <canvas id="chart"></canvas>
+    </div>
+</div>
+
+<script>
+    const climateData = [
+        { year: 2000, temperature: 14.1, sea_level: 2.1 },
+        { year: 2005, temperature: 14.2, sea_level: 2.3 },
+        { year: 2010, temperature: 14.4, sea_level: 2.5 },
+        { year: 2015, temperature: 14.7, sea_level: 2.7 },
+        { year: 2020, temperature: 15.0, sea_level: 2.9 }
+    ];
+
+    function displayData() {
+        const output = document.getElementById('output');
+        output.innerHTML = "<h3>Climate Change Data:</h3><table><tr><th>Year</th><th>Temperature</th><th>Sea Level</th></tr>";
+        climateData.forEach(row => {
+            output.innerHTML += `<tr><td>${row.year}</td><td>${row.temperature}</td><td>${row.sea_level}</td></tr>`;
+        });
+        output.innerHTML += "</table>";
+    }
+
+    function visualizeData() {
+        const year = prompt("Enter a year to visualize the temperature:");
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const chartType = document.getElementById("chartType").value;
+
+        // Generate monthly temperature data using the same prediction formula
+        const temperatures = [];
+        for (let month = 1; month <= 12; month++) {
+            const baseTemp = 0.02 * year - 25.4; // Basic yearly prediction
+            const monthlyVariation = Math.sin((month - 1) * (Math.PI / 6)) * 2; // Seasonal variation
+            const predictedTemp = baseTemp + monthlyVariation;
+            temperatures.push(predictedTemp.toFixed(2)); // Push temperature to array
+        }
+
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: months,
+                datasets: [{
+                    label: `Temperature in ${year} (°C)`,
+                    data: temperatures,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: chartType === 'area'
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Month' } },
+                    y: { title: { display: true, text: 'Temperature (°C)' } }
+                }
+            }
+        });
+    }
+
+    function predictYearlyTemperature() {
+        const year = prompt("Enter a year to predict the temperature:");
+        const predictedTemp = 0.02 * year - 25.4; // This is a mock prediction
+        alert(`The predicted temperature for the year ${year} is: ${predictedTemp.toFixed(2)}°C`);
+    }
+
+    function predictMonthlyTemperature() {
+        const year = prompt("Enter a year to predict the temperature:");
+        
+        // Ensure the month is input as a number (1-12)
+        let month = prompt("Enter a month (1-12) to predict the temperature:");
+        
+        // Convert the month input to a number
+        month = parseInt(month);
+        
+        // Check if month is a valid number between 1 and 12
+        if (isNaN(month) || month < 1 || month > 12) {
+            alert("Please enter a valid month between 1 and 12.");
+            return;
+        }
+
+        const baseTemp = 0.02 * year - 25.4; // Basic yearly prediction
+        const monthlyVariation = Math.sin((month - 1) * (Math.PI / 6)) * 2; // Simplified seasonal variation
+        const predictedTemp = baseTemp + monthlyVariation;
+
+        alert(`The predicted temperature for ${year}-${month} is: ${predictedTemp.toFixed(2)}°C`);
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
